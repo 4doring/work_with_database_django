@@ -2,6 +2,7 @@ import csv
 from datetime import datetime
 from django.core.management.base import BaseCommand
 from phones.models import Phone
+from django.utils.text import slugify
 
 
 class Command(BaseCommand):
@@ -18,7 +19,7 @@ class Command(BaseCommand):
                 image=phone['image'],
                 price=int(phone['price']),
                 release_date=datetime.strptime(phone['release_date'], "%Y-%m-%d"),
-                lte_exists=phone['lte_exists'],
-                slug=phone['name'].replace(' ', '_').lower(),
+                lte_exists=phone['lte_exists'].lower() in ('true',),
+                slug=slugify(phone['name']),
                 )
             record.save()

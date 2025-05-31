@@ -7,31 +7,24 @@ def index(request):
     return redirect('catalog')
 
 
-def get_phones(Phone):
-    return [{
-        'id': p.id,
-        'name': p.name,
-        'price': p.price,
-        'release_date': p.release_date,
-        'lte_exists': p.lte_exists,
-        'slug': p.slug,
-        'image': p.image,
-        } for p in Phone.objects.all()] 
-
-
 def show_catalog(request):
     template = 'catalog.html'
-    sort_ = request.GET.get('sort', None)   
-    phones = get_phones(Phone)
-    match sort_:
+    sort_param = request.GET.get('sort', None)   
+    phones = Phone.objects.all()
+    match sort_param:
         case 'name': 
-            phones.sort(key=lambda i: i['name'])
+            phones = phones.order_by('name')
         case 'min_price':
-            phones.sort(reverse=False, key=lambda i: i['price'])
+            phones = phones.order_by('price')
         case 'max_price':
-            phones.sort(reverse=True, key=lambda i: i['price'])
+            phones = phones.order_by('-price')
+        case _:
+            phones = phones.order_by('-id')
             
-    context = {'phones': phones}
+    context = {
+        'phones': phones,
+        'current_sort': sort_param,
+    }
     return render(request, template, context)
 
 
